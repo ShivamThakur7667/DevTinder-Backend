@@ -9,7 +9,7 @@ const validateSignUpData = (req) => {
     throw new Error("Email is not valid");
   } else if (!validator.isStrongPassword(password)) {
     throw new Error("password is not strong");
-  } else if (!["Male", "Female", "Other"].includes(gender)) {
+  } else if (!["male", "female", "others"].includes(gender)) {
     throw new Error("Gender is not valid");
   }
 };

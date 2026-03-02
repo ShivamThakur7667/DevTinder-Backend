@@ -3,13 +3,13 @@ const { userAuth } = require("../middlewares/auth");
 const ConnectionRequest = require("../models/connectionRequest");
 const User = require("../models/user");
 const { connections } = require("mongoose");
-const userRouter = express();
+const userRouter = express.Router();
 
 const USER_SAFE_DATA = [
   "firstName",
   "lastName",
   "about",
-  "imageURL", 
+  "imageURL",
   "age",
   "gender",
 ];
@@ -21,6 +21,7 @@ userRouter.get("/user/requests/received", userAuth, async (req, res) => {
     const connectionRequest = await ConnectionRequest.find({
       toUserId: loggedInUser._id,
     }).populate("fromUserId", USER_SAFE_DATA);
+    // console.log(connectionRequest);
 
     const data = connectionRequest.map((row) => ({
       reqId: row._id,
@@ -65,10 +66,17 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
 userRouter.delete("/user/:_id", userAuth, async (req, res) => {
   try {
     const { _id } = req.params;
+    const loggedInUser = req.user;
+
+    if (loggedInUser._id.toString() !== _id) {
+      return res
+        .status(403)
+        .json({ message: "You are not authorized to delete this account" });
+    }
 
     // Remove the Connection and Update the Connection List in the Database
     await User.findByIdAndDelete(_id);
-    res.json({ message: "Connection deleted Successfully !!" });
+    res.json({ message: "User deleted Successfully !!" });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

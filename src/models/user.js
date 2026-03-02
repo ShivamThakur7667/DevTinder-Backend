@@ -34,7 +34,7 @@ const userSchema = new mongoose.Schema(
     gender: {
       type: String,
       enum: {
-        values: ["male", "female", "others", "Male", "Female", "Others"],
+        values: ["male", "female", "others"],
         message: `{VALUE} is not a valid gender type`,
       },
     },
@@ -50,14 +50,22 @@ const userSchema = new mongoose.Schema(
       type: [String],
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: {
+      transform: function (doc, ret) {
+        delete ret.password;
+        return ret;
+      },
+    },
+  }
 );
 
 userSchema.index({ firstName: 1 });
 userSchema.index({ gender: 1 });
 
 userSchema.methods.getJWT = function () {
-  return jwt.sign({ _id: this._id }, "NODE@tinder$123", {
+  return jwt.sign({ _id: this._id }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
 };

@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
-const JWT_SECRET = "NODE@tinder$123";
+const JWT_SECRET = process.env.JWT_SECRET;
 
 const userAuth = async (req, res, next) => {
   try {
